@@ -85,7 +85,7 @@ Contributions are what make the open-source community such an amazing place to l
 ## 📬 Contact
 [@LakshitAgarwal](https://x.com/lakshitagarwal7?s=21) - [lakshit7811@gmail.com](mailto:lakshit7811@gmail.com)
 
-## Thanks Message <3
+## Thanks <3
 This project was made possible thanks to the contributions of many individuals and the support of our community. 
 This is written by [readme.ai](https://readme-generator-phi.vercel.app/) for better documentation.
 
