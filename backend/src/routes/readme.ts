@@ -16,12 +16,56 @@ router.post(
     let finalDestination = "";
     try {
       const { githubLink } = req.body;
+      
+      // Validate GitHub link format
       if (!githubLink) {
         res.status(400).json({ error: "Github link is required" });
         return;
       }
 
-      const newRepository = new Repository({ url: githubLink });
+      // Enhanced GitHub URL validation with auto-correction
+      const validateAndCorrectGithubUrl = (url: string) => {
+        const githubUrlPattern = /^https:\/\/github\.com\/[^\/]+\/[^\/]+(?:\/)?$/;
+        
+        // First, try the original URL
+        if (githubUrlPattern.test(url)) {
+          return { isValid: true, correctedUrl: url };
+        }
+        
+        const trimmedUrl = url.trim();
+        
+        // Try adding https:// if missing
+        if (!trimmedUrl.startsWith('http://') && !trimmedUrl.startsWith('https://')) {
+          const correctedUrl = `https://${trimmedUrl}`;
+          if (githubUrlPattern.test(correctedUrl)) {
+            return { isValid: true, correctedUrl };
+          }
+        }
+        
+        // Try converting http:// to https://
+        if (trimmedUrl.startsWith('http://')) {
+          const httpsUrl = trimmedUrl.replace('http://', 'https://');
+          if (githubUrlPattern.test(httpsUrl)) {
+            return { isValid: true, correctedUrl: httpsUrl };
+          }
+        }
+        
+        return { isValid: false, correctedUrl: url };
+      };
+
+      const validation = validateAndCorrectGithubUrl(githubLink);
+      
+      if (!validation.isValid) {
+        res.status(400).json({ 
+          error: "Invalid GitHub repository URL format. Please use: https://github.com/username/repository" 
+        });
+        return;
+      }
+
+      // Use the corrected URL for the rest of the process
+      const finalGithubLink = validation.correctedUrl;
+
+      const newRepository = new Repository({ url: finalGithubLink });
       await newRepository.save();
 
       // ----- Begin streaming response immediately -----
@@ -36,15 +80,15 @@ router.post(
         res.write(`data: ${msg}\n\n`);
       };
 
-      emit(`🌟 Starting README generation for: ${githubLink}`);
+      emit(`🌟 Starting README generation for: ${finalGithubLink}`);
 
       // Prepare destination directory
-      finalDestination = prepareClonePath(githubLink);
+      finalDestination = prepareClonePath(finalGithubLink);
 
       emit(`📂 Cloning repository to: ${finalDestination}`);
 
       // Clone the repository (may take time)
-      await cloneRepo(githubLink, finalDestination);
+      await cloneRepo(finalGithubLink, finalDestination);
 
       emit(`✅ Repository cloned successfully.`);
 

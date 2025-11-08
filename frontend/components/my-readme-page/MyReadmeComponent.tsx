@@ -92,7 +92,13 @@ export default function MyReadmeComponent({
   // Generate README
   useEffect(() => {
     const githubLink = localStorage.getItem("githubLink");
-    if (!githubLink) return;
+    
+    // If no GitHub link is found, redirect back to home
+    if (!githubLink) {
+      console.warn("No GitHub link found in localStorage, redirecting to home");
+      onBackToHome();
+      return;
+    }
 
     async function generateReadme(link: string) {
       try {
@@ -141,7 +147,7 @@ export default function MyReadmeComponent({
     }
 
     generateReadme(githubLink);
-  }, []);
+  }, [onBackToHome]);
 
   // Auto-scroll to bottom when new logs are added
   useEffect(() => {

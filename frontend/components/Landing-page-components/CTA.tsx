@@ -1,14 +1,64 @@
 import { Button } from "../ui/button";
+import toast from "react-hot-toast";
 
 interface CTAProps {
-  onGenerateClick: () => void;
+  onGenerateClick: (linkFromHero?: string) => void;
+  githubLink: string;
+  checkAndCorrectGithubLink: (link: string) => { isValid: boolean; correctedUrl: string };
 }
 
-export default function CTA({ onGenerateClick }: CTAProps) {
+export default function CTA({ onGenerateClick, githubLink, checkAndCorrectGithubLink }: CTAProps) {
   const handleClick = () => {
-    // Scroll to top to show the form and trigger generate click
-    window.scrollTo({ top: 0, behavior: "smooth" });
-    onGenerateClick();
+    // Check if we have a GitHub link entered
+    if (!githubLink.trim()) {
+      // Scroll to top to show the form and show helpful message
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      
+      // Wait for scroll to complete, then show toast and focus input
+      setTimeout(() => {
+        toast.error("Please enter your GitHub repository link above first!");
+        
+        // Try to focus the input field
+        const inputElement = document.querySelector('input[placeholder*="github.com"]') as HTMLInputElement;
+        if (inputElement) {
+          inputElement.focus();
+          inputElement.style.boxShadow = "0 0 0 3px rgba(244, 63, 94, 0.3)";
+          
+          // Remove the highlight after 3 seconds
+          setTimeout(() => {
+            inputElement.style.boxShadow = "";
+          }, 3000);
+        }
+      }, 500);
+      return;
+    }
+    
+    // Try to validate and auto-correct the URL
+    const validation = checkAndCorrectGithubLink(githubLink);
+    
+    if (!validation.isValid) {
+      // Scroll to top and highlight the input
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      
+      setTimeout(() => {
+        toast.error("Please enter a valid GitHub repository link!");
+        
+        const inputElement = document.querySelector('input[placeholder*="github.com"]') as HTMLInputElement;
+        if (inputElement) {
+          inputElement.focus();
+          inputElement.select(); // Select all text for easy editing
+          inputElement.style.boxShadow = "0 0 0 3px rgba(251, 146, 60, 0.3)";
+          
+          setTimeout(() => {
+            inputElement.style.boxShadow = "";
+          }, 3000);
+        }
+      }, 500);
+      return;
+    }
+    
+    // If we have a valid link (possibly corrected), proceed with generation
+    onGenerateClick(validation.correctedUrl);
   };
 
   return (
