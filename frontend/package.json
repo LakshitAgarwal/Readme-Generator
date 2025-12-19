@@ -19,7 +19,7 @@
     "highlight.js": "^11.11.1",
     "lucide-react": "^0.515.0",
     "motion": "^12.23.12",
-    "next": "15.3.3",
+    "next": "15.3.8",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-hot-toast": "^2.5.2",
