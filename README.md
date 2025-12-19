@@ -35,6 +35,7 @@ To set up the project, follow these steps:
 1. **Start the Backend**: Run `node server.js` to start the Express server.
 2. **Start the Frontend**: Run `npm run dev` to start the Next.js development server.
 3. **Interact with the Application**: Open your web browser and navigate to `http://localhost:3000` to use the application.
+4. Testing sync
 
 ## 📂 Project Structure
 ```markdown
